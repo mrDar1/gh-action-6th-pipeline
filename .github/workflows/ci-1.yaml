@@ -22,3 +22,39 @@ jobs:
       - name: Install dependencies
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: prepare-dependencies
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache node modules
+        id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Run tests
+        run: npm test
+
+  build-application:
+    runs-on: ubuntu-latest
+    needs: prepare-dependencies
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache node modules
+        id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Build application
+        run: npm run build
